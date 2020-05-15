@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">PCPartPicker</string>
+    <string name="title_activity_view_part_list">ViewPartListActivity</string>
+    <string name="action_clear">Clear All</string>
+    <!-- Strings used for fragments for navigation -->
+    <string name="next">Next</string>
+    <string name="previous">Previous</string>
+
+    <string name="action_savepartlist">Save Partlist</string>
+
+    <!-- TODO: Remove or change this placeholder text -->
+    <string name="hello_blank_fragment">Hello blank fragment</string>
+</resources>
