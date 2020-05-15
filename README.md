@@ -28,6 +28,8 @@ My higher-level goals for the client-side of the project are as follows:
 - [x] Implement back button in `AddEditPartListActivity`
 - [x] Define part types
 - [x] Define `requestCode`'s
+- [x] Implement `Activity` 'PartListInfoActivity'
+- [x] Implement `Activity` 'SelectPartActivity'
 
 ### Ongoing
 
@@ -35,8 +37,6 @@ My higher-level goals for the client-side of the project are as follows:
 
 ### To-Do
 
-- [ ] Implement `Activity` 'PartListInfoActivity'
-- [ ] Implement `Activity` 'SelectPartActivity'
 - [ ] Implement accurate LineItem data
 - [ ] Implement FireStore operations
 - [ ] Implement local database

@@ -1,5 +1,6 @@
 package org.naragones.pcpartpicker.fragments
 
+import android.content.Intent
 import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
@@ -7,6 +8,7 @@ import android.view.ViewGroup
 import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
+import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import org.naragones.pcpartpicker.R
@@ -17,10 +19,6 @@ import org.naragones.pcpartpicker.viewmodels.LineItemViewModel
 class LineItemFragment : Fragment() {
 
     private lateinit var viewModel: LineItemViewModel
-
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-    }
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -50,25 +48,46 @@ class LineItemFragment : Fragment() {
     }
 
     private fun setupListUpdate() {
-        this.viewModel?.getLineItems()?.observe(
+        viewModel.getLineItems().observe(
             this.viewLifecycleOwner,
             Observer { lineItems ->
                 if (lineItems.isNotEmpty()) {
-                    this.viewModel?.setLineItemListInAdapter(lineItems)
+                    this.viewModel.setLineItemListInAdapter(lineItems)
                 }
-            })
+            }
+        )
+
+        if (viewModel.getSelected() == null) {
+        }
 
         setupListClick()
     }
 
     private fun setupListClick() {
-        viewModel?.getSelected()?.observe(viewLifecycleOwner, Observer { lineItem ->
+        println("[Debug] Entered setupListClick()")
+        viewModel.getSelected()?.observe(this.viewLifecycleOwner, Observer { lineItem ->
             if (lineItem != null) {
                 Toast.makeText(
-                    this.context,
+                    context,
                     "You selected a " + lineItem.name,
                     Toast.LENGTH_SHORT
                 ).show()
+
+                println("[Debug] Activity name: " + activity?.javaClass!!.simpleName)
+
+                val pairToStart: Pair<FragmentActivity, Int>? =
+                    viewModel.activityToStart(activity!!)
+
+                if (pairToStart != null) {
+                    println("[Debug] activityToStart: " + pairToStart.first.javaClass.simpleName)
+
+                    activity.run {
+                        val intent = Intent(activity, pairToStart.first.javaClass)
+                        intent.putExtra("lineItem", lineItem)
+                        intent.putExtra("requestCode", pairToStart.second)
+                        startActivityForResult(intent, pairToStart.second)
+                    }
+                }
             }
         })
     }

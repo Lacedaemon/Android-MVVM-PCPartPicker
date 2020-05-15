@@ -25,7 +25,11 @@
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp">
+            android:padding="16dp"
+            android:clickable="true"
+            android:focusable="true"
+            android:foreground="?android:attr/selectableItemBackground"
+            android:onClick="@{() -> model.onLineItemClick(position)}">
 
             <TextView
                 android:id="@+id/card_title"
@@ -49,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/card_title"
                 android:layout_alignParentEnd="true"
-                android:text="@{model.getLineItemAt(position).priceString}"
+                android:text="@{`$` + model.getLineItemAt(position).priceString}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textColor="@android:color/holo_green_dark" />
 

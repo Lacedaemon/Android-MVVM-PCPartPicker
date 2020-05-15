@@ -64,6 +64,6 @@ class MainActivity : AppCompatActivity() {
         val lineItems: MutableList<LineItem> = mutableListOf()
         val lineItem = LineItem("True Jedi", "", 4000.0)
         lineItems.add(lineItem)
-        viewModel?.getLineItems()?.value = lineItems
+        viewModel.getLineItems().value = lineItems
     }
 }

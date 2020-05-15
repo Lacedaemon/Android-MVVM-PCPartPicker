@@ -5,5 +5,5 @@
     android:layout_height="match_parent"
     tools:context=".activities.AddEditPartListActivity">
 
-    <include layout="@layout/add_edit_partlist_content" />
+    <include layout="@layout/content_add_edit_partlist" />
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

@@ -6,7 +6,6 @@ import androidx.annotation.NonNull
 import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
-import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.viewmodels.LineItemViewModel
 
@@ -39,14 +38,8 @@ class LineItemAdapter(val layoutID: Int, val viewModel: LineItemViewModel) :
     }
 
     fun setLineItemList(list: List<LineItem>) {
-        println("layoutID: " + layoutID)
-        println("parts_rv: " + R.id.parts_rv)
-        println("Setting LineItemList in Adapter")
         this.lineItemList = list
         lineItemList!!.forEach {
-            println("[Name] " + it.name)
-            println("[Subtitle] " + it.subtitle)
-            println("[Price] " + it.priceString)
         }
     }
 
