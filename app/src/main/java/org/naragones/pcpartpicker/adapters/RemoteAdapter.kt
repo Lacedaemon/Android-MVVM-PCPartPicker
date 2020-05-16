@@ -1,4 +1,4 @@
-package org.naragones.pcpartpicker.utils
+package org.naragones.pcpartpicker.adapters
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
@@ -7,21 +7,21 @@ import androidx.databinding.DataBindingUtil
 import androidx.databinding.ViewDataBinding
 import androidx.recyclerview.widget.RecyclerView
 import org.naragones.pcpartpicker.classes.LineItem
-import org.naragones.pcpartpicker.viewmodels.LineItemViewModel
+import org.naragones.pcpartpicker.viewholders.RemoteViewHolder
+import org.naragones.pcpartpicker.viewmodels.RemoteViewModel
 
-class LineItemAdapter(val layoutID: Int, val viewModel: LineItemViewModel) :
-    RecyclerView.Adapter<LineItemViewHolder>() {
+class RemoteAdapter(val layoutID: Int, val viewModel: RemoteViewModel) :
+    RecyclerView.Adapter<RemoteViewHolder>() {
 
     private var lineItemList: List<LineItem>? = null
 
-    override fun onCreateViewHolder(@NonNull parent: ViewGroup, viewType: Int): LineItemViewHolder {
+    override fun onCreateViewHolder(@NonNull parent: ViewGroup, viewType: Int): RemoteViewHolder {
         val inflater = LayoutInflater.from(parent.context)
         val binding: ViewDataBinding = DataBindingUtil.inflate(inflater, viewType, parent, false)
-        return LineItemViewHolder(binding)
+        return RemoteViewHolder(binding)
     }
 
-    override fun onBindViewHolder(holder: LineItemViewHolder, position: Int) {
-        //val lineItem: LineItem = lineItemList[position]
+    override fun onBindViewHolder(holder: RemoteViewHolder, position: Int) {
         holder.bind(viewModel, position)
     }
 

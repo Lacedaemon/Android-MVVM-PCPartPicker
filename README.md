@@ -18,8 +18,12 @@ My higher-level goals for the client-side of the project are as follows:
 
 ## Status
 
-### Complete
+### To-Do
 
+- [ ] Implement accurate LineItem data
+- [ ] Implement FireStore operations
+- [x] Implement local database
+- [x] Save info entered into `AddEditPartListActivity`
 - [x] Implement reusable `LineItemFragment` with a `RecyclerView` to be populated with x amount of `CardView`'s
 - [x] Implement data binding
 - [x] Implement `FloatingActionButton` to add a partlist
@@ -34,13 +38,6 @@ My higher-level goals for the client-side of the project are as follows:
 ### Ongoing
 
 * Continual additions/refinements to `ViewModel`/`Adapter`
-
-### To-Do
-
-- [ ] Implement accurate LineItem data
-- [ ] Implement FireStore operations
-- [ ] Implement local database
-- [ ] Save info entered into `AddEditPartListActivity`
 
 ## Wishlist
 

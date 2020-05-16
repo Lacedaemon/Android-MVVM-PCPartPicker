@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto">
     <item
         android:id="@+id/save_partlist"
-        app:showAsAction="ifRoom"
         android:icon="@android:drawable/ic_menu_save"
-        android:title="@string/action_savepartlist" />
+        android:title="@string/action_savepartlist"
+        app:showAsAction="ifRoom" />
 </menu>

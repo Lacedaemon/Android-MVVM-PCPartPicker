@@ -12,11 +12,11 @@ import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.databinding.ActivityPartListInfoBinding
 import org.naragones.pcpartpicker.fragments.LineItemFragment
 import org.naragones.pcpartpicker.utils.RequestTypes
-import org.naragones.pcpartpicker.viewmodels.LineItemViewModel
+import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
 
 class PartListInfoActivity : AppCompatActivity() {
-    private lateinit var viewModel: LineItemViewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -24,7 +24,7 @@ class PartListInfoActivity : AppCompatActivity() {
             DataBindingUtil.setContentView(this, R.layout.activity_part_list_info)
 
         setSupportActionBar(toolbar)
-        fab.setOnClickListener { view ->
+        fab.setOnClickListener {
             val intent = Intent(this, AddEditPartListActivity::class.java)
             intent.putExtra("requestCode", RequestTypes.EDIT_PARTLIST.requestType)
             startActivityForResult(intent, RequestTypes.EDIT_PARTLIST.requestType)
@@ -37,12 +37,15 @@ class PartListInfoActivity : AppCompatActivity() {
         supportActionBar?.title = lineItem.name
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel = ViewModelProvider(this).get(LineItemViewModel::class.java)
-        populateData(viewModel)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, LineItemFragment.newInstance())
+                .replace(
+                    R.id.container, LineItemFragment.newInstance(
+
+                    )
+                )
                 .commitNow()
         }
     }
@@ -51,16 +54,5 @@ class PartListInfoActivity : AppCompatActivity() {
         this.setResult(0)
         finish()
         return true
-    }
-
-    private fun populateData(viewModel: LineItemViewModel) {
-        val lineItems: MutableList<LineItem> = mutableListOf()
-        viewModel.getPartTypes().forEach {
-            if (it.name != "NULL") {
-                val lineItem = LineItem(it.name, it.partType.toString(), 0.0)
-                lineItems.add(lineItem)
-            }
-        }
-        viewModel.getLineItems().value = lineItems
     }
 }

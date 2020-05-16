@@ -1,28 +1,31 @@
 package org.naragones.pcpartpicker.viewmodels
 
+import android.app.Application
 import androidx.fragment.app.FragmentActivity
+import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import androidx.lifecycle.ViewModel
 import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.activities.PartListInfoActivity
 import org.naragones.pcpartpicker.activities.SelectPartActivity
+import org.naragones.pcpartpicker.adapters.RemoteAdapter
 import org.naragones.pcpartpicker.classes.LineItem
-import org.naragones.pcpartpicker.classes.LineItems
-import org.naragones.pcpartpicker.utils.LineItemAdapter
 import org.naragones.pcpartpicker.utils.PartTypes
 import org.naragones.pcpartpicker.utils.RequestTypes
 
-class LineItemViewModel : ViewModel() {
-
-    private var adapter: LineItemAdapter = LineItemAdapter(R.layout.lineitem_cardview, this)
+class RemoteViewModel(application: Application) : AndroidViewModel(application) {
+    private var adapter: RemoteAdapter =
+        RemoteAdapter(
+            R.layout.lineitem_cardview,
+            this
+        )
     private var selected: MutableLiveData<LineItem> = MutableLiveData()
-    private val lineItemList: LineItems = LineItems()
+    private val lineItemList = MutableLiveData<MutableList<LineItem>>()
     private val _fragmentTitle = MutableLiveData<String>()
 
     val title: LiveData<String> get() = _fragmentTitle
 
-    fun getAdapter(): LineItemAdapter {
+    fun getAdapter(): RemoteAdapter {
         return this.adapter
     }
 
@@ -40,18 +43,18 @@ class LineItemViewModel : ViewModel() {
     }
 
     fun getLineItems(): MutableLiveData<MutableList<LineItem>> {
-        return lineItemList.lineItems
+        return lineItemList
     }
 
     fun getLineItemAt(index: Int): LineItem {
-        return (if (lineItemList.lineItems.value != null && lineItemList.lineItems.value?.size!! > index
+        return (if (lineItemList.value != null && lineItemList.value?.size!! > index
         ) {
-            lineItemList.lineItems.value!![index]
+            lineItemList.value!![index]
         } else null)!!
     }
 
     fun updateActionBarTitle(requestCode: Int) {
-        var str: String = ""
+        var str: String
         when (requestCode) {
             RequestTypes.ADD_PARTLIST.requestType -> str = "Add Partlist"
             RequestTypes.EDIT_PARTLIST.requestType -> str = "Edit Partlist"
@@ -81,5 +84,4 @@ class LineItemViewModel : ViewModel() {
 
         return null
     }
-
 }

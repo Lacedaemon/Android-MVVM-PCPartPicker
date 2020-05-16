@@ -10,7 +10,7 @@
 
         <variable
             name="model"
-            type="org.naragones.pcpartpicker.viewmodels.LineItemViewModel" />
+            type="org.naragones.pcpartpicker.viewmodels.MainViewModel" />
     </data>
 
 
@@ -18,18 +18,18 @@
         android:id="@+id/card"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp">
+        android:layout_marginTop="8dp"
+        android:layout_marginEnd="8dp">
 
         <RelativeLayout
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:padding="16dp"
             android:clickable="true"
             android:focusable="true"
             android:foreground="?android:attr/selectableItemBackground"
-            android:onClick="@{() -> model.onLineItemClick(position)}">
+            android:onClick="@{() -> model.onLineItemClick(position)}"
+            android:padding="16dp">
 
             <TextView
                 android:id="@+id/card_title"
@@ -53,7 +53,7 @@
                 android:layout_height="wrap_content"
                 android:layout_below="@+id/card_title"
                 android:layout_alignParentEnd="true"
-                android:text="@{`$` + model.getLineItemAt(position).priceString}"
+                android:text="@{`$` + String.valueOf(model.getLineItemAt(position).price)}"
                 android:textAppearance="@style/TextAppearance.AppCompat.Large"
                 android:textColor="@android:color/holo_green_dark" />
 

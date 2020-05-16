@@ -9,14 +9,13 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import org.naragones.pcpartpicker.R
-import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.fragments.LineItemFragment
 import org.naragones.pcpartpicker.utils.RequestTypes
-import org.naragones.pcpartpicker.viewmodels.LineItemViewModel
+import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
 class MainActivity : AppCompatActivity() {
 
-    private lateinit var viewModel: LineItemViewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -29,13 +28,15 @@ class MainActivity : AppCompatActivity() {
             startActivityForResult(intent, RequestTypes.ADD_PARTLIST.requestType)
         }
 
-        viewModel = ViewModelProvider(this).get(LineItemViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        populateData(viewModel)
+//        populateData()
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, LineItemFragment.newInstance())
+                .replace(
+                    R.id.container, LineItemFragment.newInstance()
+                )
                 .commitNow()
         }
     }
@@ -50,7 +51,7 @@ class MainActivity : AppCompatActivity() {
         // Handle action bar item clicks here. The action bar will
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
-        this.viewModel.getLineItems().value?.clear()
+        this.viewModel.deleteAll()
         this.viewModel.getAdapter().notifyDataSetChanged()
         Toast.makeText(
             this,
@@ -60,10 +61,14 @@ class MainActivity : AppCompatActivity() {
         return true
     }
 
-    private fun populateData(viewModel: LineItemViewModel) {
-        val lineItems: MutableList<LineItem> = mutableListOf()
-        val lineItem = LineItem("True Jedi", "", 4000.0)
-        lineItems.add(lineItem)
-        viewModel.getLineItems().value = lineItems
-    }
+//    private fun populateData() {
+////        val lineItems: MutableList<LineItem> = mutableListOf()
+////        val lineItem = LineItem("True Jedi", "", 4000.0)
+////        lineItems.add(lineItem)
+////        viewModel.getLineItems().value = lineItems
+//
+//        viewModel.getLineItems()?.observe(this, Observer {
+//            viewModel.getAdapter().setLineItemList(it)
+//        });
+//    }
 }

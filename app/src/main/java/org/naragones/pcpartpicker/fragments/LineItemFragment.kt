@@ -12,13 +12,15 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import org.naragones.pcpartpicker.R
+import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.databinding.FragmentLineItemBinding
 import org.naragones.pcpartpicker.utils.RequestTypes
-import org.naragones.pcpartpicker.viewmodels.LineItemViewModel
+import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
 class LineItemFragment : Fragment() {
 
-    private lateinit var viewModel: LineItemViewModel
+    private lateinit var viewModel: MainViewModel
+    private var requestCode: Int? = null
 
     override fun onCreateView(
         inflater: LayoutInflater, container: ViewGroup?,
@@ -28,16 +30,10 @@ class LineItemFragment : Fragment() {
         val binding: FragmentLineItemBinding =
             DataBindingUtil.inflate(inflater, R.layout.fragment_line_item, container, false)
         binding.lifecycleOwner = this.viewLifecycleOwner
-        activity?.run {
-            viewModel = ViewModelProvider(this).get(LineItemViewModel::class.java)
-        }
-        viewModel.updateActionBarTitle(
-            activity?.intent!!.getIntExtra(
-                "requestCode",
-                RequestTypes.NULL.requestType
-            )
-        )
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         binding.model = viewModel
+        requestCode = activity?.intent?.getIntExtra("requestCode", RequestTypes.NULL.requestType)!!
+        viewModel.setRequestCode(requestCode!!)
         return binding.root
     }
 
@@ -48,16 +44,18 @@ class LineItemFragment : Fragment() {
     }
 
     private fun setupListUpdate() {
-        viewModel.getLineItems().observe(
-            this.viewLifecycleOwner,
-            Observer { lineItems ->
-                if (lineItems.isNotEmpty()) {
-                    this.viewModel.setLineItemListInAdapter(lineItems)
-                }
+        when (requestCode) {
+            RequestTypes.NULL.requestType -> {
+                viewModel.getLineItems()?.observe(
+                    viewLifecycleOwner,
+                    Observer {
+                        this.viewModel.setLineItemListInAdapter(it)
+                    }
+                )
             }
-        )
-
-        if (viewModel.getSelected() == null) {
+            else -> {
+                populateData(viewModel)
+            }
         }
 
         setupListClick()
@@ -92,6 +90,19 @@ class LineItemFragment : Fragment() {
         })
     }
 
+    private fun populateData(viewModel: MainViewModel) {
+        val lineItems: MutableList<LineItem> = mutableListOf()
+        var i: Int = 0
+        viewModel.getPartTypes().forEach {
+            if (it.name != "NULL") {
+                val lineItem = LineItem(i, it.name, it.partType.toString(), 0.0, "part")
+                lineItems.add(lineItem)
+            }
+            i++
+        }
+        viewModel.setLineItemListInAdapter(lineItems)
+    }
+
     companion object {
         /**
          * Use this factory method to create a new instance of
@@ -105,8 +116,8 @@ class LineItemFragment : Fragment() {
         @JvmStatic
         fun newInstance() =
             LineItemFragment().apply {
-                arguments = Bundle().apply {
-                }
             }
+
+
     }
 }

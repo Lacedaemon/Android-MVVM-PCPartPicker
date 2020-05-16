@@ -18,16 +18,16 @@
         tools:showIn="@layout/activity_part_list_info">
 
         <TextView
-            android:paddingTop="18dp"
             android:id="@+id/totalPrice"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@{`$` + lineItem.priceString}"
+            android:paddingTop="18dp"
+            android:text="@{`$` + String.valueOf(lineItem.price)}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@android:color/holo_green_dark"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toTopOf="parent"
-            android:textAppearance="@style/TextAppearance.AppCompat.Large"
-            android:textColor="@android:color/holo_green_dark" />
+            app:layout_constraintTop_toTopOf="parent" />
 
         <FrameLayout
             android:id="@+id/container"

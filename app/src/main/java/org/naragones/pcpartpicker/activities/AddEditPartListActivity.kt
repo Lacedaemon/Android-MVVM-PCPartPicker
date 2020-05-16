@@ -5,32 +5,45 @@ import android.view.Menu
 import android.view.MenuItem
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
+import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.classes.LineItem
+import org.naragones.pcpartpicker.databinding.ActivityAddEditPartlistBinding
 import org.naragones.pcpartpicker.fragments.LineItemFragment
-import org.naragones.pcpartpicker.viewmodels.LineItemViewModel
+import org.naragones.pcpartpicker.utils.RequestTypes
+import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
 
 class AddEditPartListActivity : AppCompatActivity() {
-    private lateinit var viewModel: LineItemViewModel
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_add_edit_part_list)
+        val activityBinding: ActivityAddEditPartlistBinding =
+            DataBindingUtil.setContentView(this, R.layout.activity_add_edit_partlist)
 
-        viewModel = ViewModelProvider(this).get(LineItemViewModel::class.java)
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
         viewModel.title.observe(this, Observer {
             supportActionBar?.title = it
         })
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        populateData(viewModel)
+        viewModel.updateActionBarTitle(
+            intent!!.getIntExtra(
+                "requestCode",
+                RequestTypes.NULL.requestType
+            )
+        )
+
+        activityBinding.model = viewModel
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, LineItemFragment.newInstance())
+                .replace(
+                    R.id.container, LineItemFragment.newInstance()
+                )
                 .commitNow()
         }
     }
@@ -44,12 +57,20 @@ class AddEditPartListActivity : AppCompatActivity() {
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         when (item?.itemId) {
             R.id.save_partlist -> {
+                viewModel.insert(
+                    LineItem(
+                        null,
+                        viewModel.getPartListTitle(),
+                        "Commander in the Grand Army of the Republic",
+                        0.0,
+                        "Fulcrum"
+                    )
+                )
                 Toast.makeText(
                     this,
-                    "Saved as [to-do]",
+                    "Saved as '" + viewModel.getPartListTitle() + "'",
                     Toast.LENGTH_SHORT
                 ).show()
-                this.setResult(0)
                 finish()
                 return true
             }
@@ -57,16 +78,5 @@ class AddEditPartListActivity : AppCompatActivity() {
         this.setResult(0)
         finish()
         return true
-    }
-
-    private fun populateData(viewModel: LineItemViewModel) {
-        val lineItems: MutableList<LineItem> = mutableListOf()
-        viewModel.getPartTypes().forEach {
-            if (it.name != "NULL") {
-                val lineItem = LineItem(it.name, it.partType.toString(), 0.0)
-                lineItems.add(lineItem)
-            }
-        }
-        viewModel.getLineItems().value = lineItems
     }
 }

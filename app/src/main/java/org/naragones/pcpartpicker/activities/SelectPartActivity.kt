@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import org.naragones.pcpartpicker.R
+import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.fragments.LineItemFragment
 
 class SelectPartActivity : AppCompatActivity() {
@@ -12,11 +13,18 @@ class SelectPartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_part)
 
+        val lineItem = intent.getSerializableExtra("lineItem") as LineItem
+
+        supportActionBar?.title = lineItem.name
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
-                .replace(R.id.container, LineItemFragment.newInstance())
+                .replace(
+                    R.id.container, LineItemFragment.newInstance(
+
+                    )
+                )
                 .commitNow()
         }
     }
