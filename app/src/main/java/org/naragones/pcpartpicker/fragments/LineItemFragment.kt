@@ -12,7 +12,6 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import org.naragones.pcpartpicker.R
-import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.databinding.FragmentLineItemBinding
 import org.naragones.pcpartpicker.utils.RequestTypes
 import org.naragones.pcpartpicker.viewmodels.MainViewModel
@@ -40,67 +39,41 @@ class LineItemFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        setupListUpdate()
-    }
-
-    private fun setupListUpdate() {
         when (requestCode) {
             RequestTypes.NULL.requestType -> {
                 viewModel.getLineItems()?.observe(
                     viewLifecycleOwner,
                     Observer {
-                        this.viewModel.setLineItemListInAdapter(it)
+                        viewModel.setLineItemListInAdapter(it)
                     }
                 )
             }
-            else -> {
-                populateData(viewModel)
-            }
         }
-
-        setupListClick()
-    }
-
-    private fun setupListClick() {
-        println("[Debug] Entered setupListClick()")
         viewModel.getSelected()?.observe(this.viewLifecycleOwner, Observer { lineItem ->
             if (lineItem != null) {
                 Toast.makeText(
                     context,
-                    "You selected a " + lineItem.name,
+                    "You selected a " + lineItem.title,
                     Toast.LENGTH_SHORT
                 ).show()
 
                 println("[Debug] Activity name: " + activity?.javaClass!!.simpleName)
 
                 val pairToStart: Pair<FragmentActivity, Int>? =
-                    viewModel.activityToStart(activity!!)
+                    viewModel.activityToStart(requireActivity())
 
                 if (pairToStart != null) {
                     println("[Debug] activityToStart: " + pairToStart.first.javaClass.simpleName)
 
                     activity.run {
                         val intent = Intent(activity, pairToStart.first.javaClass)
-                        intent.putExtra("lineItem", lineItem)
                         intent.putExtra("requestCode", pairToStart.second)
+                        intent.putExtra("lineItem", lineItem.id)
                         startActivityForResult(intent, pairToStart.second)
                     }
                 }
             }
         })
-    }
-
-    private fun populateData(viewModel: MainViewModel) {
-        val lineItems: MutableList<LineItem> = mutableListOf()
-        var i: Int = 0
-        viewModel.getPartTypes().forEach {
-            if (it.name != "NULL") {
-                val lineItem = LineItem(i, it.name, it.partType.toString(), 0.0, "part")
-                lineItems.add(lineItem)
-            }
-            i++
-        }
-        viewModel.setLineItemListInAdapter(lineItems)
     }
 
     companion object {

@@ -29,7 +29,7 @@ class LocalDbHelper(context: Context) :
                 LocalDatabaseContract.LineItem.toString() + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
                 LocalDatabaseContract.LineItem.COLUMN_NAME_UUID.toString() + " TEXT, " +
                 LocalDatabaseContract.LineItem.COLUMN_NAME_TITLE.toString() + " TEXT, " +
-                LocalDatabaseContract.LineItem.COLUMN_NAME_SUBTITLE.toString() + " INTEGER, " +
+                LocalDatabaseContract.LineItem.COLUMN_NAME_SUBTITLE.toString() + " TEXT, " +
                 LocalDatabaseContract.LineItem.COLUMN_NAME_PRICE.toString() + " REAL, " +
                 ")"
 

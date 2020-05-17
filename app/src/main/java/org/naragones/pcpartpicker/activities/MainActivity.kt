@@ -22,15 +22,13 @@ class MainActivity : AppCompatActivity() {
         setContentView(R.layout.activity_main)
         setSupportActionBar(toolbar)
 
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
+
         fab.setOnClickListener {
             val intent = Intent(this, AddEditPartListActivity::class.java)
             intent.putExtra("requestCode", RequestTypes.ADD_PARTLIST.requestType)
             startActivityForResult(intent, RequestTypes.ADD_PARTLIST.requestType)
         }
-
-        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-
-//        populateData()
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
@@ -60,15 +58,4 @@ class MainActivity : AppCompatActivity() {
         ).show()
         return true
     }
-
-//    private fun populateData() {
-////        val lineItems: MutableList<LineItem> = mutableListOf()
-////        val lineItem = LineItem("True Jedi", "", 4000.0)
-////        lineItems.add(lineItem)
-////        viewModel.getLineItems().value = lineItems
-//
-//        viewModel.getLineItems()?.observe(this, Observer {
-//            viewModel.getAdapter().setLineItemList(it)
-//        });
-//    }
 }

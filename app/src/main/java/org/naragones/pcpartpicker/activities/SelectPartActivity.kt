@@ -4,8 +4,9 @@ import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
 import org.naragones.pcpartpicker.R
-import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.fragments.LineItemFragment
+import org.naragones.pcpartpicker.utils.PartTypes.NULL
+import org.naragones.pcpartpicker.utils.PartTypes.values
 
 class SelectPartActivity : AppCompatActivity() {
 
@@ -13,9 +14,9 @@ class SelectPartActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_select_part)
 
-        val lineItem = intent.getSerializableExtra("lineItem") as LineItem
+        val partType = intent.getIntExtra("lineItem", NULL.partType)
 
-        supportActionBar?.title = lineItem.name
+        supportActionBar?.title = values()[partType].name
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         if (savedInstanceState == null) {

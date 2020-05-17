@@ -39,13 +39,6 @@ class MainAdapter(val layoutID: Int, val viewModel: MainViewModel) :
 
     fun setLineItemList(list: List<LineItem?>?) {
         lineItemList = list
-        lineItemList!!.forEach {
-        }
-
-        if (lineItemList!!.isNotEmpty()) {
-            println("[Debug] List has a thing")
-        } else println("[Debug] lineItemList is empty!")
-
 
         notifyDataSetChanged()
     }

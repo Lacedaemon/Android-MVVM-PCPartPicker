@@ -14,6 +14,7 @@ import org.naragones.pcpartpicker.repository.LineItemRepository
 import org.naragones.pcpartpicker.utils.PartTypes
 import org.naragones.pcpartpicker.utils.RequestTypes
 
+
 class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     private var adapter: MainAdapter =
@@ -21,16 +22,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             R.layout.lineitem_cardview,
             this
         )
-    private var selected: MutableLiveData<LineItem> = MutableLiveData()
-    private val repository =
-        LineItemRepository(application)
-    private val localLineItemList: LiveData<List<LineItem?>?>? = repository.getAll()
-    private val remoteLineItemList: MutableLiveData<List<LineItem?>?>? = MutableLiveData()
-    private val requestCode: MutableLiveData<Int>? = MutableLiveData()
+    private var selected = MutableLiveData<LineItem>()
+    private val repository = LineItemRepository(application)
+    private val localLineItemList = repository.getAll()
+    private val remoteLineItemList = MutableLiveData<List<LineItem?>?>()
+    private val requestCode = MutableLiveData<Int>()
     private val _fragmentTitle = MutableLiveData<String>()
     private var _partListTitle: String = ""
-
-    val title: LiveData<String> get() = _fragmentTitle
 
     init {
         populateRemoteData()
@@ -45,11 +43,11 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         this.adapter.notifyDataSetChanged()
     }
 
-    fun getPartTypes(): List<PartTypes> {
+    private fun getPartTypes(): List<PartTypes> {
         return PartTypes.values().asList()
     }
 
-    fun getSelected(): MutableLiveData<LineItem>? {
+    fun getSelected(): LiveData<LineItem>? {
         return this.selected
     }
 
@@ -58,33 +56,33 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getLineItemAt(index: Int): LineItem? {
-        when (requestCode?.value) {
+//        println("[Debug] lineItemIndex: " + index)
+        return when (requestCode.value) {
             RequestTypes.NULL.requestType -> {
-                return (if (localLineItemList?.value != null && localLineItemList.value?.size!! > index
+                (if (localLineItemList?.value != null && localLineItemList.value?.size!! > index
                 ) {
                     localLineItemList.value!![index]
-                } else LineItem(0, "", "", 0.0, ""))!!
+                } else LineItem(-1, "", "", 0.0, ""))!!
             }
             else -> {
-                return (if (remoteLineItemList?.value != null && remoteLineItemList.value?.size!! > index
+                (if (remoteLineItemList.value != null && remoteLineItemList.value?.size!! > index
                 ) {
                     remoteLineItemList.value!![index]
-                } else LineItem(0, "", "", 0.0, ""))!!
+                } else LineItem(-1, "", "", 0.0, ""))!!
             }
         }
     }
 
     fun updateActionBarTitle(requestCode: Int) {
-        var str: String
-        when (requestCode) {
-            RequestTypes.ADD_PARTLIST.requestType -> str = "Add Partlist"
-            RequestTypes.EDIT_PARTLIST.requestType -> str = "Edit Partlist"
+        val str: String = when (requestCode) {
+            RequestTypes.ADD_PARTLIST.requestType -> "Add Partlist"
+            RequestTypes.EDIT_PARTLIST.requestType -> "Edit Partlist"
             else -> {
                 return
             }
         }
 
-        _fragmentTitle.postValue(str)
+        _fragmentTitle.value = str
     }
 
     fun onLineItemClick(index: Int) {
@@ -106,17 +104,17 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return null
     }
 
-    fun populateRemoteData() {
+    private fun populateRemoteData() {
         val lineItems: MutableList<LineItem> = mutableListOf()
-        var i: Int = 0
+        var i = 0
         getPartTypes().forEach {
             if (it.name != "NULL") {
-                val lineItem = LineItem(i, it.name, it.partType.toString(), 0.0, "part")
+                val lineItem = LineItem(i, it.name, it.partType.toString(), 0.0, "")
                 lineItems.add(lineItem)
             }
             i++
         }
-        remoteLineItemList?.value = lineItems
+        remoteLineItemList.value = lineItems
         setLineItemListInAdapter(lineItems)
     }
 
@@ -128,21 +126,56 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return _partListTitle
     }
 
-    fun setRequestCode(inboundCode: Int) {
-        requestCode?.value = inboundCode
+    fun getFragmentTitle(): LiveData<String> {
+        return _fragmentTitle
     }
 
-    fun insert(lineItem: LineItem?) {
+    fun addEditPartList(requestCode: Int, lineItem: LineItem) {
+        when (requestCode) {
+            RequestTypes.ADD_PARTLIST.requestType -> {
+                insert(
+                    LineItem(
+                        null,
+                        getPartListTitle(),
+                        "Commander in the Grand Army of the Republic",
+                        0.0,
+                        "Fulcrum"
+                    )
+                )
+            }
+            RequestTypes.EDIT_PARTLIST.requestType -> {
+                update(
+                    LineItem(
+                        lineItem.id,
+                        getPartListTitle(),
+                        "Commander in the Grand Army of the Republic",
+                        0.0,
+                        "Fulcrum"
+                    )
+                )
+            }
+        }
+    }
+
+    fun setRequestCode(inboundCode: Int) {
+        requestCode.value = inboundCode
+    }
+
+    fun requestSpecificLineItem(_id: Int?): LiveData<LineItem> {
+        return repository.getSpecific(_id)
+    }
+
+    private fun insert(lineItem: LineItem?) {
         repository.insert(lineItem)
     }
 
-    fun update(lineItem: LineItem?) {
+    private fun update(lineItem: LineItem?) {
         repository.update(lineItem)
     }
 
-    fun delete(lineItem: LineItem?) {
-        repository.delete(lineItem)
-    }
+//    fun delete(lineItem: LineItem?) {
+//        repository.delete(lineItem)
+//    }
 
     fun deleteAll() {
         repository.deleteAll()

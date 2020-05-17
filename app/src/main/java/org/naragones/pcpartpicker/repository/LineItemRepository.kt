@@ -13,7 +13,6 @@ class LineItemRepository(application: Application) {
             application
         )
     private var lineItemDao: LineItemDao? = database?.lineItemDao()
-    private var all: LiveData<List<LineItem?>?>? = lineItemDao?.getAll()
 
     // API that repository exposes to outside.
     fun insert(lineItem: LineItem?) {
@@ -40,22 +39,26 @@ class LineItemRepository(application: Application) {
         ).execute()
     }
 
+    fun getSpecific(seqID: Int?): LiveData<LineItem> {
+//        DebugASyncTask(lineItemDao).execute()
+        println("[Debug] Repo received ID: $seqID")
+        return lineItemDao!!.getSpecific(seqID)
+    }
+
     fun getAll(): LiveData<List<LineItem?>?>? {
-        return all
+//        DebugASyncTask(lineItemDao)
+        return lineItemDao?.getAll()
     }
 
     // AsyncTasks to do db operations since they're not allowed on main thread
-    private class InsertAsyncTask internal constructor(LineItemDao: LineItemDao?) :
+
+    private class InsertAsyncTask internal constructor(private val LineItemDao: LineItemDao?) :
         AsyncTask<LineItem?, Void?, Void?>() {
-        private val LineItemDao: LineItemDao?
         override fun doInBackground(vararg params: LineItem?): Void? {
             LineItemDao?.insert(params[0])
             return null
         }
 
-        init {
-            this.LineItemDao = LineItemDao
-        }
     }
 
     private class UpdateAsyncTask internal constructor(LineItemDao: LineItemDao?) :
@@ -96,4 +99,19 @@ class LineItemRepository(application: Application) {
             this.LineItemDao = LineItemDao
         }
     }
+
+//        private class DebugASyncTask internal constructor(private val LineItemDao: LineItemDao?) :
+//        AsyncTask<LineItem?, Void?, Void?>() {
+//        override fun doInBackground(vararg params: LineItem?): Void? {
+//            println("[Debug] getAll(): " + DatabaseUtils.dumpCursorToString(LineItemDao?.getCursorAll()))
+//            println("[Debug] getSpecificTest() : " + DatabaseUtils.dumpCursorToString(LineItemDao?.getSpecificDebug(2)))
+//
+//            val specific = LineItemDao?.getSpecificTest(3)
+//
+////            println("[Debug] specific(): " + specific?.name)
+//
+//            return null
+//        }
+//
+//    }
 }

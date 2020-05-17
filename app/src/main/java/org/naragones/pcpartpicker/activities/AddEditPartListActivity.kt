@@ -12,30 +12,38 @@ import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.databinding.ActivityAddEditPartlistBinding
 import org.naragones.pcpartpicker.fragments.LineItemFragment
+import org.naragones.pcpartpicker.utils.PartTypes
 import org.naragones.pcpartpicker.utils.RequestTypes
 import org.naragones.pcpartpicker.viewmodels.MainViewModel
+import kotlin.properties.Delegates
 
 
 class AddEditPartListActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
+    private var requestCode by Delegates.notNull<Int>()
+    private var lineItemID: Int = PartTypes.NULL.partType
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        requestCode = intent!!.getIntExtra(
+            "requestCode",
+            RequestTypes.NULL.requestType
+        )
+
+        println("[Debug] requestCode: " + requestCode)
+
+        lineItemID = intent.getIntExtra("lineItem", PartTypes.NULL.partType)
+
         super.onCreate(savedInstanceState)
         val activityBinding: ActivityAddEditPartlistBinding =
             DataBindingUtil.setContentView(this, R.layout.activity_add_edit_partlist)
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        viewModel.title.observe(this, Observer {
+        viewModel.getFragmentTitle().observe(this, Observer {
             supportActionBar?.title = it
         })
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        viewModel.updateActionBarTitle(
-            intent!!.getIntExtra(
-                "requestCode",
-                RequestTypes.NULL.requestType
-            )
-        )
+        viewModel.updateActionBarTitle(requestCode)
 
         activityBinding.model = viewModel
 
@@ -55,27 +63,16 @@ class AddEditPartListActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        when (item?.itemId) {
-            R.id.save_partlist -> {
-                viewModel.insert(
-                    LineItem(
-                        null,
-                        viewModel.getPartListTitle(),
-                        "Commander in the Grand Army of the Republic",
-                        0.0,
-                        "Fulcrum"
-                    )
-                )
-                Toast.makeText(
-                    this,
-                    "Saved as '" + viewModel.getPartListTitle() + "'",
-                    Toast.LENGTH_SHORT
-                ).show()
-                finish()
-                return true
-            }
-        }
-        this.setResult(0)
+        viewModel.addEditPartList(
+            requestCode,
+            LineItem(lineItemID, viewModel.getPartListTitle(), "", 0.0, "")
+        )
+
+        Toast.makeText(
+            this,
+            "Saved as '" + viewModel.getPartListTitle() + "'",
+            Toast.LENGTH_SHORT
+        ).show()
         finish()
         return true
     }
