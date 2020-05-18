@@ -7,7 +7,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
-import com.google.android.material.appbar.CollapsingToolbarLayout
 import kotlinx.android.synthetic.main.activity_part_list_info.*
 import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.databinding.ActivityPartListInfoBinding
@@ -43,6 +42,10 @@ class PartListInfoActivity : AppCompatActivity() {
         }
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
+        viewModel.requestSpecificLineItem(lineItem).observe(this, Observer {
+            activityBinding.lineItem = it
+        })
+
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
                 .replace(
@@ -52,13 +55,6 @@ class PartListInfoActivity : AppCompatActivity() {
                 )
                 .commitNow()
         }
-    }
-
-    override fun onResume() {
-        super.onResume()
-        viewModel.requestSpecificLineItem(lineItem).observe(this, Observer {
-            findViewById<CollapsingToolbarLayout>(R.id.toolbar_layout).title = it.title
-        })
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {

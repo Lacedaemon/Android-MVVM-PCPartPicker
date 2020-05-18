@@ -14,5 +14,6 @@ class LocalDatabaseContract {
         const val COLUMN_NAME_SUBTITLE = "subtitle"
         const val COLUMN_NAME_PRICE = "price"
         const val COLUMN_NAME_UUID = "uuid"
+        const val COLUMN_NAME_UUID_LIST = "uuidList"
     }
 }

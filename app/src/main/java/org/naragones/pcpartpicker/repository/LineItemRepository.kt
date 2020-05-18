@@ -3,16 +3,21 @@ package org.naragones.pcpartpicker.repository
 import android.app.Application
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
+import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.QuerySnapshot
 import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.repository.local.LineItemDao
 import org.naragones.pcpartpicker.repository.local.LocalDatabase
 
 class LineItemRepository(application: Application) {
-    val database: LocalDatabase? =
+    private val database: LocalDatabase? =
         LocalDatabase.getInstance(
             application
         )
     private var lineItemDao: LineItemDao? = database?.lineItemDao()
+
+    private val firestore = FirebaseFirestore.getInstance()
 
     // API that repository exposes to outside.
     fun insert(lineItem: LineItem?) {
@@ -48,6 +53,14 @@ class LineItemRepository(application: Application) {
     fun getAll(): LiveData<List<LineItem?>?>? {
 //        DebugASyncTask(lineItemDao)
         return lineItemDao?.getAll()
+    }
+
+    fun getRemoteByType(type: String): Task<QuerySnapshot> {
+        return firestore.collection("parts").whereEqualTo("type", type).get()
+    }
+
+    fun getRemoteByUUID(uuid: String) {
+
     }
 
     // AsyncTasks to do db operations since they're not allowed on main thread

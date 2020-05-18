@@ -41,6 +41,7 @@ class AddEditPartListActivity : AppCompatActivity() {
         viewModel.getFragmentTitle().observe(this, Observer {
             supportActionBar?.title = it
         })
+
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
         viewModel.updateActionBarTitle(requestCode)
@@ -63,9 +64,16 @@ class AddEditPartListActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
+        val uuid = mutableListOf<String?>()
+        viewModel.getLineItems()?.observe(this, Observer {
+            it?.forEach {
+                uuid.add(it?.uuid)
+            }
+        })
+
         viewModel.addEditPartList(
             requestCode,
-            LineItem(lineItemID, viewModel.getPartListTitle(), "", 0.0, "")
+            LineItem(lineItemID, viewModel.getPartListTitle(), "", 0.0, "", uuid)
         )
 
         Toast.makeText(

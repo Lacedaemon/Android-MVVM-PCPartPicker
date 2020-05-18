@@ -5,10 +5,13 @@ import android.os.AsyncTask
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
+import androidx.room.TypeConverters
 import androidx.sqlite.db.SupportSQLiteDatabase
 import org.naragones.pcpartpicker.classes.LineItem
+import org.naragones.pcpartpicker.utils.ListToRoom
 
 @Database(entities = [LineItem::class], version = 1, exportSchema = false)
+@TypeConverters(ListToRoom::class)
 abstract class LocalDatabase : RoomDatabase() {
     abstract fun lineItemDao(): LineItemDao?
 
@@ -48,7 +51,8 @@ abstract class LocalDatabase : RoomDatabase() {
                     "True Jedi",
                     "Build",
                     4000.00,
-                    ""
+                    "",
+                    mutableListOf()
                 )
             )
             return null

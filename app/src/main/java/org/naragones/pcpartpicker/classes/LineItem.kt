@@ -12,5 +12,6 @@ class LineItem(
     @ColumnInfo(name = "title") val title: String,
     @ColumnInfo(name = "subtitle") val subtitle: String,
     @ColumnInfo(name = "price") val price: Double,
-    @ColumnInfo(name = "uuid") val uuid: String
+    @ColumnInfo(name = "uuid") val uuid: String,
+    @ColumnInfo(name = "uuidList") val uuidList: MutableList<String?>?
 ) : BaseObservable()

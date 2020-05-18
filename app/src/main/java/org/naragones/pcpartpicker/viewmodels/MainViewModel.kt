@@ -25,14 +25,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private var selected = MutableLiveData<LineItem>()
     private val repository = LineItemRepository(application)
     private val localLineItemList = repository.getAll()
-    private val remoteLineItemList = MutableLiveData<List<LineItem?>?>()
+    val remoteLineItemList = MutableLiveData<List<LineItem?>?>()
     private val requestCode = MutableLiveData<Int>()
     private val _fragmentTitle = MutableLiveData<String>()
     private var _partListTitle: String = ""
-
-    init {
-        populateRemoteData()
-    }
 
     fun getAdapter(): MainAdapter {
         return this.adapter
@@ -62,13 +58,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 (if (localLineItemList?.value != null && localLineItemList.value?.size!! > index
                 ) {
                     localLineItemList.value!![index]
-                } else LineItem(-1, "", "", 0.0, ""))!!
+                } else LineItem(-1, "null", "null", 0.0, "", mutableListOf()))!!
             }
             else -> {
                 (if (remoteLineItemList.value != null && remoteLineItemList.value?.size!! > index
                 ) {
                     remoteLineItemList.value!![index]
-                } else LineItem(-1, "", "", 0.0, ""))!!
+                } else LineItem(-1, "null", "null", 0.0, "", mutableListOf()))!!
             }
         }
     }
@@ -104,12 +100,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         return null
     }
 
-    private fun populateRemoteData() {
+    fun populatePartTypes() {
         val lineItems: MutableList<LineItem> = mutableListOf()
         var i = 0
         getPartTypes().forEach {
             if (it.name != "NULL") {
-                val lineItem = LineItem(i, it.name, it.partType.toString(), 0.0, "")
+                val lineItem = LineItem(it.partType, it.name, "", 0.0, "", mutableListOf())
                 lineItems.add(lineItem)
             }
             i++
@@ -139,7 +135,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         getPartListTitle(),
                         "Commander in the Grand Army of the Republic",
                         0.0,
-                        "Fulcrum"
+                        ",",
+                        lineItem.uuidList
                     )
                 )
             }
@@ -150,7 +147,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         getPartListTitle(),
                         "Commander in the Grand Army of the Republic",
                         0.0,
-                        "Fulcrum"
+                        lineItem.uuid,
+                        lineItem.uuidList
                     )
                 )
             }
@@ -163,6 +161,40 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun requestSpecificLineItem(_id: Int?): LiveData<LineItem> {
         return repository.getSpecific(_id)
+    }
+
+    fun getRemoteByType(type: String) {
+        val lineItems = mutableListOf<LineItem>()
+        var i = 0
+        repository.getRemoteByType(type).addOnSuccessListener { documents ->
+            for (document in documents) run {
+                val info: HashMap<String, String> = document.data["info"] as HashMap<String, String>
+                var prices: HashMap<String, Double> =
+                    document.data["prices"] as HashMap<String, Double>
+
+                val finalPrices = mutableListOf<Double>()
+
+                prices.forEach {
+                    if (it.value != 0.0) {
+                        finalPrices.add(it.value)
+                    }
+                }
+
+                val title = info["brand"] + " " + info["series"] + " " + info["model"]
+                lineItems.add(
+                    LineItem(
+                        i,
+                        title,
+                        type,
+                        finalPrices.min()!!,
+                        document.id,
+                        mutableListOf()
+                    )
+                )
+                i++
+            }
+            remoteLineItemList.value = lineItems
+        }
     }
 
     private fun insert(lineItem: LineItem?) {

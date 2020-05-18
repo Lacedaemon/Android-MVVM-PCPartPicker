@@ -27,10 +27,11 @@ class LocalDbHelper(context: Context) :
     private val CREATE_LOCAL_TABLE =
         "CREATE TABLE " + LocalDatabaseContract.LineItem.TABLE_NAME.toString() + "( " +
                 LocalDatabaseContract.LineItem.toString() + " INTEGER PRIMARY KEY AUTOINCREMENT, " +
-                LocalDatabaseContract.LineItem.COLUMN_NAME_UUID.toString() + " TEXT, " +
                 LocalDatabaseContract.LineItem.COLUMN_NAME_TITLE.toString() + " TEXT, " +
                 LocalDatabaseContract.LineItem.COLUMN_NAME_SUBTITLE.toString() + " TEXT, " +
                 LocalDatabaseContract.LineItem.COLUMN_NAME_PRICE.toString() + " REAL, " +
+                LocalDatabaseContract.LineItem.COLUMN_NAME_UUID.toString() + " TEXT, " +
+                LocalDatabaseContract.LineItem.COLUMN_NAME_UUID_LIST.toString() + " TEXT, " +
                 ")"
 
     private val SQL_DELETE_ENTRIES =

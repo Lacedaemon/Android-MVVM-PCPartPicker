@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -13,6 +12,7 @@ import androidx.lifecycle.Observer
 import androidx.lifecycle.ViewModelProvider
 import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.databinding.FragmentLineItemBinding
+import org.naragones.pcpartpicker.utils.PartTypes
 import org.naragones.pcpartpicker.utils.RequestTypes
 import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
@@ -48,23 +48,37 @@ class LineItemFragment : Fragment() {
                     }
                 )
             }
+            RequestTypes.ADD_PARTLIST.requestType -> {
+                viewModel.populatePartTypes()
+            }
+            RequestTypes.EDIT_PARTLIST.requestType -> {
+                viewModel.populatePartTypes()
+            }
+            RequestTypes.CHOOSE_PART.requestType -> {
+                viewModel.remoteLineItemList.observe(this.viewLifecycleOwner, Observer {
+                    viewModel.setLineItemListInAdapter(it)
+                })
+                viewModel.getRemoteByType(
+                    PartTypes.values()[requireActivity().intent.getIntExtra(
+                        "lineItem",
+                        PartTypes.NULL.partType
+                    )].name
+                )
+            }
         }
+
         viewModel.getSelected()?.observe(this.viewLifecycleOwner, Observer { lineItem ->
             if (lineItem != null) {
-                Toast.makeText(
-                    context,
-                    "You selected a " + lineItem.title,
-                    Toast.LENGTH_SHORT
-                ).show()
-
-                println("[Debug] Activity name: " + activity?.javaClass!!.simpleName)
+//                Toast.makeText(
+//                    context,
+//                    "You selected a " + lineItem.title,
+//                    Toast.LENGTH_SHORT
+//                ).show()
 
                 val pairToStart: Pair<FragmentActivity, Int>? =
                     viewModel.activityToStart(requireActivity())
 
                 if (pairToStart != null) {
-                    println("[Debug] activityToStart: " + pairToStart.first.javaClass.simpleName)
-
                     activity.run {
                         val intent = Intent(activity, pairToStart.first.javaClass)
                         intent.putExtra("requestCode", pairToStart.second)

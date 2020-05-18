@@ -3,12 +3,15 @@ package org.naragones.pcpartpicker.activities
 import android.os.Bundle
 import android.view.MenuItem
 import androidx.appcompat.app.AppCompatActivity
+import androidx.lifecycle.ViewModelProvider
 import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.fragments.LineItemFragment
 import org.naragones.pcpartpicker.utils.PartTypes.NULL
 import org.naragones.pcpartpicker.utils.PartTypes.values
+import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
 class SelectPartActivity : AppCompatActivity() {
+    private lateinit var viewModel: MainViewModel
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -18,6 +21,8 @@ class SelectPartActivity : AppCompatActivity() {
 
         supportActionBar?.title = values()[partType].name
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
