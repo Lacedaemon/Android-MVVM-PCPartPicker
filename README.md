@@ -21,7 +21,9 @@ My higher-level goals for the client-side of the project are as follows:
 ### To-Do
 
 - [ ] Implement accurate LineItem data
-- [ ] Implement FireStore operations
+- [ ] Implement total price where applicable
+- [ ] Implement editing of partlists
+- [x] Implement FireStore operations
 - [x] Implement local database
 - [x] Save info entered into `AddEditPartListActivity`
 - [x] Implement reusable `LineItemFragment` with a `RecyclerView` to be populated with x amount of `CardView`'s

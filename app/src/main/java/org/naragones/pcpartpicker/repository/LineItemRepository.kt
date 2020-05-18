@@ -4,6 +4,7 @@ import android.app.Application
 import android.os.AsyncTask
 import androidx.lifecycle.LiveData
 import com.google.android.gms.tasks.Task
+import com.google.firebase.firestore.DocumentSnapshot
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.QuerySnapshot
 import org.naragones.pcpartpicker.classes.LineItem
@@ -46,7 +47,6 @@ class LineItemRepository(application: Application) {
 
     fun getSpecific(seqID: Int?): LiveData<LineItem> {
 //        DebugASyncTask(lineItemDao).execute()
-        println("[Debug] Repo received ID: $seqID")
         return lineItemDao!!.getSpecific(seqID)
     }
 
@@ -59,8 +59,8 @@ class LineItemRepository(application: Application) {
         return firestore.collection("parts").whereEqualTo("type", type).get()
     }
 
-    fun getRemoteByUUID(uuid: String) {
-
+    fun getRemoteByUUID(uuid: String): Task<DocumentSnapshot> {
+        return firestore.collection("parts").document(uuid).get()
     }
 
     // AsyncTasks to do db operations since they're not allowed on main thread

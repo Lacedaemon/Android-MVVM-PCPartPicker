@@ -5,54 +5,33 @@ import androidx.fragment.app.FragmentActivity
 import androidx.lifecycle.AndroidViewModel
 import androidx.lifecycle.LiveData
 import androidx.lifecycle.MutableLiveData
-import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.activities.PartListInfoActivity
 import org.naragones.pcpartpicker.activities.SelectPartActivity
-import org.naragones.pcpartpicker.adapters.MainAdapter
 import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.repository.LineItemRepository
-import org.naragones.pcpartpicker.utils.PartTypes
-import org.naragones.pcpartpicker.utils.RequestTypes
+import org.naragones.pcpartpicker.types.PartTypes
+import org.naragones.pcpartpicker.types.RequestTypes
 
 
 class MainViewModel(application: Application) : AndroidViewModel(application) {
-
-    private var adapter: MainAdapter =
-        MainAdapter(
-            R.layout.lineitem_cardview,
-            this
-        )
-    private var selected = MutableLiveData<LineItem>()
     private val repository = LineItemRepository(application)
-    private val localLineItemList = repository.getAll()
-    val remoteLineItemList = MutableLiveData<List<LineItem?>?>()
     private val requestCode = MutableLiveData<Int>()
-    private val _fragmentTitle = MutableLiveData<String>()
-    private var _partListTitle: String = ""
+    val localLineItemList = repository.getAll()
+    val remoteLineItemList = MutableLiveData<List<LineItem?>?>()
+    var fragmentTitle = MutableLiveData<String>()
+    var partListTitle = ""
+    var selected = MutableLiveData<LineItem>()
+    var totalPrice = MutableLiveData<Double>()
 
-    fun getAdapter(): MainAdapter {
-        return this.adapter
-    }
-
-    fun setLineItemListInAdapter(lineItemList: List<LineItem?>?) {
-        this.adapter.setLineItemList(lineItemList)
-        this.adapter.notifyDataSetChanged()
+    init {
+        totalPrice.value = 0.0
     }
 
     private fun getPartTypes(): List<PartTypes> {
         return PartTypes.values().asList()
     }
 
-    fun getSelected(): LiveData<LineItem>? {
-        return this.selected
-    }
-
-    fun getLineItems(): LiveData<List<LineItem?>?>? {
-        return localLineItemList
-    }
-
     fun getLineItemAt(index: Int): LineItem? {
-//        println("[Debug] lineItemIndex: " + index)
         return when (requestCode.value) {
             RequestTypes.NULL.requestType -> {
                 (if (localLineItemList?.value != null && localLineItemList.value?.size!! > index
@@ -78,7 +57,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             }
         }
 
-        _fragmentTitle.value = str
+        fragmentTitle.value = str
     }
 
     fun onLineItemClick(index: Int) {
@@ -94,6 +73,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             "AddEditPartListActivity" -> return Pair(
                 SelectPartActivity(),
                 RequestTypes.CHOOSE_PART.requestType
+            )
+            "SelectPartActivity" -> return Pair(
+                activity, -1
             )
         }
 
@@ -111,19 +93,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
             i++
         }
         remoteLineItemList.value = lineItems
-        setLineItemListInAdapter(lineItems)
     }
 
     fun sharePartListTitleWithView(s: CharSequence) {
-        _partListTitle = s.toString()
-    }
-
-    fun getPartListTitle(): String {
-        return _partListTitle
-    }
-
-    fun getFragmentTitle(): LiveData<String> {
-        return _fragmentTitle
+        partListTitle = s.toString()
     }
 
     fun addEditPartList(requestCode: Int, lineItem: LineItem) {
@@ -132,8 +105,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 insert(
                     LineItem(
                         null,
-                        getPartListTitle(),
-                        "Commander in the Grand Army of the Republic",
+                        partListTitle,
+                        "Build",
                         0.0,
                         ",",
                         lineItem.uuidList
@@ -144,8 +117,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 update(
                     LineItem(
                         lineItem.id,
-                        getPartListTitle(),
-                        "Commander in the Grand Army of the Republic",
+                        partListTitle,
+                        "Build",
                         0.0,
                         lineItem.uuid,
                         lineItem.uuidList
@@ -165,25 +138,16 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
 
     fun getRemoteByType(type: String) {
         val lineItems = mutableListOf<LineItem>()
-        var i = 0
         repository.getRemoteByType(type).addOnSuccessListener { documents ->
             for (document in documents) run {
                 val info: HashMap<String, String> = document.data["info"] as HashMap<String, String>
-                var prices: HashMap<String, Double> =
-                    document.data["prices"] as HashMap<String, Double>
 
-                val finalPrices = mutableListOf<Double>()
-
-                prices.forEach {
-                    if (it.value != 0.0) {
-                        finalPrices.add(it.value)
-                    }
-                }
+                val finalPrices = getLowestPrice(document.data["prices"] as HashMap<String, Double>)
 
                 val title = info["brand"] + " " + info["series"] + " " + info["model"]
                 lineItems.add(
                     LineItem(
-                        i,
+                        PartTypes.valueOf(type).partType,
                         title,
                         type,
                         finalPrices.min()!!,
@@ -191,9 +155,67 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                         mutableListOf()
                     )
                 )
-                i++
             }
             remoteLineItemList.value = lineItems
+        }
+    }
+
+    fun getRemoteByID(uuidList: MutableList<String?>?) {
+        val lineItems = mutableListOf<LineItem>()
+        uuidList?.forEach {
+            if (it != null) {
+                repository.getRemoteByUUID(it).addOnSuccessListener {
+                    val info: HashMap<String, String> =
+                        it.data?.get("info") as HashMap<String, String>
+                    val finalPrice =
+                        getLowestPrice(it.data?.get("prices") as HashMap<String, Double>).min()
+
+                    val title = info["brand"] + " " + info["series"] + " " + info["model"]
+                    lineItems.add(
+                        LineItem(
+                            PartTypes.valueOf(it.get("type") as String).partType,
+                            it.get("type") as String,
+                            title,
+                            finalPrice!!,
+                            it.id,
+                            mutableListOf()
+                        )
+                    )
+
+                    totalPrice.value = totalPrice.value?.plus(finalPrice)
+
+                    lineItems.sortBy {
+                        it.id
+                    }
+                    remoteLineItemList.value = lineItems
+                }
+            }
+        }
+    }
+
+    private fun getLowestPrice(prices: HashMap<String, Double>): MutableList<Double> {
+        val finalPrices = mutableListOf<Double>()
+        prices.forEach {
+            if (it.value != 0.0) {
+                finalPrices.add(it.value)
+            }
+        }
+        return finalPrices
+    }
+
+    fun drawSelectedPart(resultCode: Int, selectedPart: LineItem) {
+        if (resultCode == RequestTypes.CHOOSE_PART.requestType) {
+            val partToBeReplaced = remoteLineItemList.value?.get(selectedPart.id?.minus(1)!!)
+
+
+            if (partToBeReplaced != null) {
+                partToBeReplaced.subtitle = selectedPart.title
+                partToBeReplaced.uuid = selectedPart.uuid
+                partToBeReplaced.price = selectedPart.price
+
+                remoteLineItemList.value?.toTypedArray()
+                    ?.set(selectedPart.id!! - 1, partToBeReplaced)
+            }
         }
     }
 

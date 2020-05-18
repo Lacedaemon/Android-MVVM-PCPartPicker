@@ -6,8 +6,8 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.lifecycle.ViewModelProvider
 import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.fragments.LineItemFragment
-import org.naragones.pcpartpicker.utils.PartTypes.NULL
-import org.naragones.pcpartpicker.utils.PartTypes.values
+import org.naragones.pcpartpicker.types.PartTypes.NULL
+import org.naragones.pcpartpicker.types.PartTypes.values
 import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
 class SelectPartActivity : AppCompatActivity() {
@@ -36,7 +36,6 @@ class SelectPartActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        this.setResult(0)
         finish()
         return true
     }

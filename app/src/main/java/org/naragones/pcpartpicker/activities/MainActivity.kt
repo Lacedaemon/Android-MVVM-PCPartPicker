@@ -10,7 +10,7 @@ import androidx.lifecycle.ViewModelProvider
 import kotlinx.android.synthetic.main.activity_main.*
 import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.fragments.LineItemFragment
-import org.naragones.pcpartpicker.utils.RequestTypes
+import org.naragones.pcpartpicker.types.RequestTypes
 import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
 class MainActivity : AppCompatActivity() {
@@ -50,7 +50,6 @@ class MainActivity : AppCompatActivity() {
         // automatically handle clicks on the Home/Up button, so long
         // as you specify a parent activity in AndroidManifest.xml.
         this.viewModel.deleteAll()
-        this.viewModel.getAdapter().notifyDataSetChanged()
         Toast.makeText(
             this,
             "Partlists cleared",

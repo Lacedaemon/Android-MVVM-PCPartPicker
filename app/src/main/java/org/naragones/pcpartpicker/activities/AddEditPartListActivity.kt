@@ -12,8 +12,8 @@ import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.databinding.ActivityAddEditPartlistBinding
 import org.naragones.pcpartpicker.fragments.LineItemFragment
-import org.naragones.pcpartpicker.utils.PartTypes
-import org.naragones.pcpartpicker.utils.RequestTypes
+import org.naragones.pcpartpicker.types.PartTypes
+import org.naragones.pcpartpicker.types.RequestTypes
 import org.naragones.pcpartpicker.viewmodels.MainViewModel
 import kotlin.properties.Delegates
 
@@ -29,16 +29,17 @@ class AddEditPartListActivity : AppCompatActivity() {
             RequestTypes.NULL.requestType
         )
 
-        println("[Debug] requestCode: " + requestCode)
-
         lineItemID = intent.getIntExtra("lineItem", PartTypes.NULL.partType)
 
         super.onCreate(savedInstanceState)
-        val activityBinding: ActivityAddEditPartlistBinding =
-            DataBindingUtil.setContentView(this, R.layout.activity_add_edit_partlist)
+        val activityBinding =
+            DataBindingUtil.setContentView<ActivityAddEditPartlistBinding>(
+                this,
+                R.layout.activity_add_edit_partlist
+            )
 
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
-        viewModel.getFragmentTitle().observe(this, Observer {
+        viewModel.fragmentTitle.observe(this, Observer {
             supportActionBar?.title = it
         })
 
@@ -65,20 +66,19 @@ class AddEditPartListActivity : AppCompatActivity() {
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
         val uuid = mutableListOf<String?>()
-        viewModel.getLineItems()?.observe(this, Observer {
-            it?.forEach {
-                uuid.add(it?.uuid)
-            }
-        })
+
+        viewModel.remoteLineItemList.value!!.forEach {
+            if (it?.uuid ?: String != "") uuid.add(it!!.uuid)
+        }
 
         viewModel.addEditPartList(
             requestCode,
-            LineItem(lineItemID, viewModel.getPartListTitle(), "", 0.0, "", uuid)
+            LineItem(lineItemID, viewModel.partListTitle, "", 0.0, "", uuid)
         )
 
         Toast.makeText(
             this,
-            "Saved as '" + viewModel.getPartListTitle() + "'",
+            "Saved as '" + viewModel.partListTitle + "'",
             Toast.LENGTH_SHORT
         ).show()
         finish()

@@ -1,4 +1,4 @@
-package org.naragones.pcpartpicker.utils
+package org.naragones.pcpartpicker.types
 
 enum class RequestTypes(val requestType: Int) {
     NULL(0),

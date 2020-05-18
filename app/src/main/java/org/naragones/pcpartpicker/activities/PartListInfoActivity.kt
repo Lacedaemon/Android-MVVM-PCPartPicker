@@ -11,14 +11,14 @@ import kotlinx.android.synthetic.main.activity_part_list_info.*
 import org.naragones.pcpartpicker.R
 import org.naragones.pcpartpicker.databinding.ActivityPartListInfoBinding
 import org.naragones.pcpartpicker.fragments.LineItemFragment
-import org.naragones.pcpartpicker.utils.PartTypes
-import org.naragones.pcpartpicker.utils.RequestTypes
+import org.naragones.pcpartpicker.types.PartTypes
+import org.naragones.pcpartpicker.types.RequestTypes
 import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
 
 class PartListInfoActivity : AppCompatActivity() {
     private lateinit var viewModel: MainViewModel
-    private var lineItem: Int = PartTypes.NULL.partType
+    private var lineItemID: Int = PartTypes.NULL.partType
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -32,18 +32,24 @@ class PartListInfoActivity : AppCompatActivity() {
 
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
 
-        lineItem = intent.getIntExtra("lineItem", PartTypes.NULL.partType)
+        lineItemID = intent.getIntExtra("lineItem", PartTypes.NULL.partType)
 
         fab.setOnClickListener {
             val intent = Intent(this, AddEditPartListActivity::class.java)
             intent.putExtra("requestCode", RequestTypes.EDIT_PARTLIST.requestType)
-            intent.putExtra("lineItem", lineItem)
+            intent.putExtra("lineItem", lineItemID)
             startActivityForResult(intent, RequestTypes.EDIT_PARTLIST.requestType)
         }
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
 
-        viewModel.requestSpecificLineItem(lineItem).observe(this, Observer {
+        viewModel.requestSpecificLineItem(lineItemID).observe(this, Observer {
             activityBinding.lineItem = it
+        })
+
+        activityBinding.model = viewModel
+        activityBinding.lifecycleOwner = this
+
+        viewModel.totalPrice.observe(this, Observer {
         })
 
         if (savedInstanceState == null) {
@@ -58,7 +64,6 @@ class PartListInfoActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        this.setResult(0)
         finish()
         return true
     }

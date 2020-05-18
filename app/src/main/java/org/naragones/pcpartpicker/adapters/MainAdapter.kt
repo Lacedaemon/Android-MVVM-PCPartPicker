@@ -40,6 +40,12 @@ class MainAdapter(val layoutID: Int, val viewModel: MainViewModel) :
     fun setLineItemList(list: List<LineItem?>?) {
         lineItemList = list
 
+//        lineItemList?.forEach {
+//            if (it != null) {
+//                println("[Debug] lineItem from adapter: " + it.id + ", " + it.title)
+//            }
+//        }
+
         notifyDataSetChanged()
     }
 

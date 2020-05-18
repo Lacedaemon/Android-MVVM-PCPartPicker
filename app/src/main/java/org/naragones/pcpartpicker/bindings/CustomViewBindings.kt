@@ -11,7 +11,6 @@ object CustomViewBindings {
         recyclerView: RecyclerView,
         toDoAdapter: RecyclerView.Adapter<RecyclerView.ViewHolder>
     ) {
-        println("Entered bindRecyclerViewAdapter")
         recyclerView.apply {
             layoutManager = LinearLayoutManager(recyclerView.context)
             adapter = toDoAdapter

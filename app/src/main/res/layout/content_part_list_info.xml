@@ -4,8 +4,8 @@
     <data>
 
         <variable
-            name="lineItem"
-            type="org.naragones.pcpartpicker.classes.LineItem" />
+            name="model"
+            type="org.naragones.pcpartpicker.viewmodels.MainViewModel" />
     </data>
 
     <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
@@ -22,7 +22,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:paddingTop="18dp"
-            android:text="@{`$` + String.valueOf(lineItem.price)}"
+            android:text="@{`$` + model.totalPrice.toString()}"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             android:textColor="@android:color/holo_green_dark"
             app:layout_constraintEnd_toEndOf="parent"
