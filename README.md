@@ -10,6 +10,8 @@ My higher-level goals for the client-side of the project are as follows:
 * Gain a deeper understanding of the MVVM development architecture
 * Write clean, efficient code
 
+This app does not claim to adhere to MVVM one-hundred-and-one percent.  It does, however, strive to as best it can.
+
 ## Dependencies
 
 |Item|Description|
@@ -20,9 +22,9 @@ My higher-level goals for the client-side of the project are as follows:
 
 ### To-Do
 
-- [ ] Implement accurate LineItem data
-- [ ] Implement total price where applicable
-- [ ] Implement editing of partlists
+- [x] Implement accurate LineItem data
+- [x] Implement total price where applicable
+- [x] Implement editing of partlists
 - [x] Implement FireStore operations
 - [x] Implement local database
 - [x] Save info entered into `AddEditPartListActivity`
@@ -37,12 +39,11 @@ My higher-level goals for the client-side of the project are as follows:
 - [x] Implement `Activity` 'PartListInfoActivity'
 - [x] Implement `Activity` 'SelectPartActivity'
 
-### Ongoing
-
-* Continual additions/refinements to `ViewModel`/`Adapter`
-
 ## Wishlist
 
 * Icons underneath partlists
 * Fancier partlist info screens
 * Swiping of partlists in `MainActivity`
+* Swipe to refresh
+* Error handling
+* More intelligence, e.g. part compatibility, efficient local/remote database querying, data handling between components

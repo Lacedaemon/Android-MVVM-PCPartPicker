@@ -38,6 +38,7 @@ class PartListInfoActivity : AppCompatActivity() {
             val intent = Intent(this, AddEditPartListActivity::class.java)
             intent.putExtra("requestCode", RequestTypes.EDIT_PARTLIST.requestType)
             intent.putExtra("lineItem", lineItemID)
+            intent.putExtra("existingParts", viewModel.remoteLineItemList.value)
             startActivityForResult(intent, RequestTypes.EDIT_PARTLIST.requestType)
         }
         viewModel = ViewModelProvider(this).get(MainViewModel::class.java)
@@ -48,9 +49,6 @@ class PartListInfoActivity : AppCompatActivity() {
 
         activityBinding.model = viewModel
         activityBinding.lifecycleOwner = this
-
-        viewModel.totalPrice.observe(this, Observer {
-        })
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()

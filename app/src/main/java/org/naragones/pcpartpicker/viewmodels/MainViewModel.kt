@@ -17,14 +17,15 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private val repository = LineItemRepository(application)
     private val requestCode = MutableLiveData<Int>()
     val localLineItemList = repository.getAll()
-    val remoteLineItemList = MutableLiveData<List<LineItem?>?>()
+    val remoteLineItemList = MutableLiveData<ArrayList<LineItem?>?>()
     var fragmentTitle = MutableLiveData<String>()
-    var partListTitle = ""
+    var partListTitle = MutableLiveData<String>()
     var selected = MutableLiveData<LineItem>()
     var totalPrice = MutableLiveData<Double>()
 
     init {
         totalPrice.value = 0.0
+        partListTitle.value = ""
     }
 
     private fun getPartTypes(): List<PartTypes> {
@@ -60,6 +61,10 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         fragmentTitle.value = str
     }
 
+    fun onTextChanged(s: CharSequence) {
+        partListTitle.value = s.toString()
+    }
+
     fun onLineItemClick(index: Int) {
         this.selected.value = getLineItemAt(index)
     }
@@ -83,7 +88,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun populatePartTypes() {
-        val lineItems: MutableList<LineItem> = mutableListOf()
+        val lineItems: ArrayList<LineItem?> = arrayListOf()
         var i = 0
         getPartTypes().forEach {
             if (it.name != "NULL") {
@@ -95,8 +100,14 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         remoteLineItemList.value = lineItems
     }
 
-    fun sharePartListTitleWithView(s: CharSequence) {
-        partListTitle = s.toString()
+    fun injectExistingParts(existingParts: ArrayList<LineItem?>) {
+        existingParts.iterator().forEach {
+            if (it != null) {
+                remoteLineItemList.value?.set(it.id?.minus(1)!!, it)
+                totalPrice.value =
+                    totalPrice.value?.plus(remoteLineItemList.value?.get(it.id?.minus(1)!!)?.price!!)
+            }
+        }
     }
 
     fun addEditPartList(requestCode: Int, lineItem: LineItem) {
@@ -105,9 +116,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 insert(
                     LineItem(
                         null,
-                        partListTitle,
+                        partListTitle.value!!,
                         "Build",
-                        0.0,
+                        totalPrice.value!!,
                         ",",
                         lineItem.uuidList
                     )
@@ -117,9 +128,9 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                 update(
                     LineItem(
                         lineItem.id,
-                        partListTitle,
+                        partListTitle.value!!,
                         "Build",
-                        0.0,
+                        totalPrice.value!!,
                         lineItem.uuid,
                         lineItem.uuidList
                     )
@@ -137,14 +148,13 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getRemoteByType(type: String) {
-        val lineItems = mutableListOf<LineItem>()
+        val lineItems = arrayListOf<LineItem?>()
         repository.getRemoteByType(type).addOnSuccessListener { documents ->
             for (document in documents) run {
                 val info: HashMap<String, String> = document.data["info"] as HashMap<String, String>
-
                 val finalPrices = getLowestPrice(document.data["prices"] as HashMap<String, Double>)
-
                 val title = info["brand"] + " " + info["series"] + " " + info["model"]
+
                 lineItems.add(
                     LineItem(
                         PartTypes.valueOf(type).partType,
@@ -161,7 +171,8 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     }
 
     fun getRemoteByID(uuidList: MutableList<String?>?) {
-        val lineItems = mutableListOf<LineItem>()
+        totalPrice.value = 0.0
+        val lineItems = arrayListOf<LineItem?>()
         uuidList?.forEach {
             if (it != null) {
                 repository.getRemoteByUUID(it).addOnSuccessListener {
@@ -185,7 +196,7 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
                     totalPrice.value = totalPrice.value?.plus(finalPrice)
 
                     lineItems.sortBy {
-                        it.id
+                        it?.id
                     }
                     remoteLineItemList.value = lineItems
                 }
@@ -207,11 +218,12 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
         if (resultCode == RequestTypes.CHOOSE_PART.requestType) {
             val partToBeReplaced = remoteLineItemList.value?.get(selectedPart.id?.minus(1)!!)
 
-
             if (partToBeReplaced != null) {
+                totalPrice.value = totalPrice.value?.minus(partToBeReplaced.price)
                 partToBeReplaced.subtitle = selectedPart.title
                 partToBeReplaced.uuid = selectedPart.uuid
                 partToBeReplaced.price = selectedPart.price
+                totalPrice.value = totalPrice.value?.plus(selectedPart.price)
 
                 remoteLineItemList.value?.toTypedArray()
                     ?.set(selectedPart.id!! - 1, partToBeReplaced)
@@ -226,10 +238,6 @@ class MainViewModel(application: Application) : AndroidViewModel(application) {
     private fun update(lineItem: LineItem?) {
         repository.update(lineItem)
     }
-
-//    fun delete(lineItem: LineItem?) {
-//        repository.delete(lineItem)
-//    }
 
     fun deleteAll() {
         repository.deleteAll()

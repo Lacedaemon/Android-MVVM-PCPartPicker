@@ -47,7 +47,14 @@ class AddEditPartListActivity : AppCompatActivity() {
 
         viewModel.updateActionBarTitle(requestCode)
 
+        if (requestCode == RequestTypes.EDIT_PARTLIST.requestType) {
+            viewModel.requestSpecificLineItem(lineItemID).observe(this, Observer {
+                viewModel.partListTitle.value = it.title
+            })
+        }
+
         activityBinding.model = viewModel
+        activityBinding.lifecycleOwner = this
 
         if (savedInstanceState == null) {
             supportFragmentManager.beginTransaction()
@@ -65,23 +72,32 @@ class AddEditPartListActivity : AppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem?): Boolean {
-        val uuid = mutableListOf<String?>()
+        when (item?.itemId) {
+            android.R.id.home -> {
+                finish()
+                return true
+            }
+            else -> {
+                val uuid = mutableListOf<String?>()
 
-        viewModel.remoteLineItemList.value!!.forEach {
-            if (it?.uuid ?: String != "") uuid.add(it!!.uuid)
+                viewModel.remoteLineItemList.value!!.forEach {
+                    if (it?.uuid ?: String != "") uuid.add(it!!.uuid)
+                }
+
+                viewModel.addEditPartList(
+                    requestCode,
+                    LineItem(lineItemID, viewModel.partListTitle.value!!, "", 0.0, "", uuid)
+                )
+
+                Toast.makeText(
+                    this,
+                    "Saved as '" + viewModel.partListTitle.value + "'",
+                    Toast.LENGTH_SHORT
+                ).show()
+                finish()
+                return true
+            }
         }
 
-        viewModel.addEditPartList(
-            requestCode,
-            LineItem(lineItemID, viewModel.partListTitle, "", 0.0, "", uuid)
-        )
-
-        Toast.makeText(
-            this,
-            "Saved as '" + viewModel.partListTitle + "'",
-            Toast.LENGTH_SHORT
-        ).show()
-        finish()
-        return true
     }
 }

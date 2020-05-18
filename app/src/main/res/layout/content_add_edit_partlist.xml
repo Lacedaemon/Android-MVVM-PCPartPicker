@@ -2,7 +2,6 @@
 <layout>
 
     <data>
-
         <variable
             name="model"
             type="org.naragones.pcpartpicker.viewmodels.MainViewModel" />
@@ -20,22 +19,35 @@
             android:id="@+id/AddEditPartListTitle"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:afterTextChanged="@{(edtitable)->model.sharePartListTitleWithView(edtitable)}"
+            android:text="@{model.partListTitle}"
+            android:afterTextChanged="@{(edtitable)->model.onTextChanged(edtitable)}"
             android:ems="10"
             android:gravity="center_horizontal"
             android:inputType="textPersonName"
-            android:text=""
             android:textAlignment="center"
             android:textAppearance="@style/TextAppearance.AppCompat.Large"
             app:layout_constraintEnd_toEndOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
+        <TextView
+            android:id="@+id/totalPrice"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingTop="9dp"
+            android:text="@{`$` + model.totalPrice.toString()}"
+            android:textAppearance="@style/TextAppearance.AppCompat.Large"
+            android:textColor="@android:color/holo_green_dark"
+            app:layout_constraintEnd_toEndOf="@id/AddEditPartListTitle"
+            app:layout_constraintStart_toStartOf="@id/AddEditPartListTitle"
+            app:layout_constraintTop_toBottomOf="@id/AddEditPartListTitle" />
+
+
         <FrameLayout
             android:id="@+id/container"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:paddingTop="67dp">
+            android:paddingTop="96dp">
 
         </FrameLayout>
 

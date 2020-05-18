@@ -7,7 +7,7 @@ import java.lang.reflect.Type
 import java.util.*
 
 class ListToRoom {
-    var gson = Gson()
+    private var gson = Gson()
 
     @TypeConverter
     fun stringToSomeObjectList(data: String?): MutableList<String>? {

@@ -5,7 +5,6 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.Toast
 import androidx.databinding.DataBindingUtil
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentActivity
@@ -49,8 +48,6 @@ class LineItemFragment : Fragment() {
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
 
-        println("[Debug] Fragment started")
-
         populateList()
         onLineItemSelected()
     }
@@ -73,6 +70,13 @@ class LineItemFragment : Fragment() {
             }
             RequestTypes.EDIT_PARTLIST.requestType -> {
                 viewModel.populatePartTypes()
+                if (activity?.intent?.getStringArrayListExtra("existingParts") != null) {
+                    viewModel.injectExistingParts(activity?.intent?.getStringArrayListExtra("existingParts") as ArrayList<LineItem?>)
+                }
+
+                viewModel.remoteLineItemList.observe(this.viewLifecycleOwner, Observer {
+                    adapter.setLineItemList(it)
+                })
             }
             RequestTypes.VIEW_PARTLIST.requestType -> {
                 activity?.run {
@@ -107,11 +111,11 @@ class LineItemFragment : Fragment() {
     private fun onLineItemSelected() {
         viewModel.selected.observe(this.viewLifecycleOwner, Observer { lineItem ->
             if (lineItem != null) {
-                Toast.makeText(
-                    context,
-                    "You selected a " + lineItem.title,
-                    Toast.LENGTH_SHORT
-                ).show()
+//                Toast.makeText(
+//                    context,
+//                    "You selected a " + lineItem.title,
+//                    Toast.LENGTH_SHORT
+//                ).show()
 
                 val pairToStart: Pair<FragmentActivity, Int>? =
                     viewModel.activityToStart(requireActivity())
@@ -149,20 +153,7 @@ class LineItemFragment : Fragment() {
     }
 
     companion object {
-        /**
-         * Use this factory method to create a new instance of
-         * this fragment using the provided parameters.
-         *
-         * @param param1 Parameter 1.
-         * @param param2 Parameter 2.
-         * @return A new instance of fragment LineItemFragment.
-         */
-        // TODO: Rename and change types and number of parameters
         @JvmStatic
-        fun newInstance() =
-            LineItemFragment().apply {
-            }
-
-
+        fun newInstance() = LineItemFragment().apply {}
     }
 }

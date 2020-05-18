@@ -1,12 +1,10 @@
 package org.naragones.pcpartpicker.repository.local
 
 import android.content.Context
-import android.os.AsyncTask
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
-import androidx.sqlite.db.SupportSQLiteDatabase
 import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.utils.ListToRoom
 
@@ -33,29 +31,6 @@ abstract class LocalDatabase : RoomDatabase() {
         }
 
         private val roomCallback: Callback = object : Callback() {
-            override fun onCreate(db: SupportSQLiteDatabase) {
-                super.onCreate(db)
-                PopulateDBAsyncTask(instance).execute()
-            }
-        }
-    }
-
-    private class PopulateDBAsyncTask internal constructor(db: LocalDatabase?) :
-        AsyncTask<Void?, Void?, Void?>() {
-        private val LineItemDao: LineItemDao? = db?.lineItemDao()
-
-        override fun doInBackground(vararg params: Void?): Void? {
-            LineItemDao?.insert(
-                LineItem(
-                    null,
-                    "True Jedi",
-                    "Build",
-                    4000.00,
-                    "",
-                    mutableListOf()
-                )
-            )
-            return null
         }
     }
 }

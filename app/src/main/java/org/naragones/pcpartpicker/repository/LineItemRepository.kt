@@ -33,12 +33,6 @@ class LineItemRepository(application: Application) {
         ).execute(lineItem)
     }
 
-    fun delete(lineItem: LineItem?) {
-        DeleteAsyncTask(
-            lineItemDao
-        ).execute(lineItem)
-    }
-
     fun deleteAll() {
         DeleteAllAsyncTask(
             lineItemDao
@@ -46,12 +40,10 @@ class LineItemRepository(application: Application) {
     }
 
     fun getSpecific(seqID: Int?): LiveData<LineItem> {
-//        DebugASyncTask(lineItemDao).execute()
         return lineItemDao!!.getSpecific(seqID)
     }
 
     fun getAll(): LiveData<List<LineItem?>?>? {
-//        DebugASyncTask(lineItemDao)
         return lineItemDao?.getAll()
     }
 
@@ -74,57 +66,21 @@ class LineItemRepository(application: Application) {
 
     }
 
-    private class UpdateAsyncTask internal constructor(LineItemDao: LineItemDao?) :
+    private class UpdateAsyncTask internal constructor(private val LineItemDao: LineItemDao?) :
         AsyncTask<LineItem?, Void?, Void?>() {
-        private val LineItemDao: LineItemDao?
         override fun doInBackground(vararg params: LineItem?): Void? {
             LineItemDao?.update(params[0])
             return null
         }
 
-        init {
-            this.LineItemDao = LineItemDao
-        }
     }
 
-    private class DeleteAsyncTask internal constructor(LineItemDao: LineItemDao?) :
-        AsyncTask<LineItem?, Void?, Void?>() {
-        private val LineItemDao: LineItemDao?
-        override fun doInBackground(vararg params: LineItem?): Void? {
-            LineItemDao?.delete(params[0])
-            return null
-        }
-
-        init {
-            this.LineItemDao = LineItemDao
-        }
-    }
-
-    private class DeleteAllAsyncTask internal constructor(LineItemDao: LineItemDao?) :
+    private class DeleteAllAsyncTask internal constructor(private val LineItemDao: LineItemDao?) :
         AsyncTask<Void?, Void?, Void?>() {
-        private val LineItemDao: LineItemDao?
         override fun doInBackground(vararg params: Void?): Void? {
             LineItemDao?.clear()
             return null
         }
 
-        init {
-            this.LineItemDao = LineItemDao
-        }
     }
-
-//        private class DebugASyncTask internal constructor(private val LineItemDao: LineItemDao?) :
-//        AsyncTask<LineItem?, Void?, Void?>() {
-//        override fun doInBackground(vararg params: LineItem?): Void? {
-//            println("[Debug] getAll(): " + DatabaseUtils.dumpCursorToString(LineItemDao?.getCursorAll()))
-//            println("[Debug] getSpecificTest() : " + DatabaseUtils.dumpCursorToString(LineItemDao?.getSpecificDebug(2)))
-//
-//            val specific = LineItemDao?.getSpecificTest(3)
-//
-////            println("[Debug] specific(): " + specific?.name)
-//
-//            return null
-//        }
-//
-//    }
 }

@@ -10,7 +10,7 @@ import org.naragones.pcpartpicker.classes.LineItem
 import org.naragones.pcpartpicker.viewholders.MainViewHolder
 import org.naragones.pcpartpicker.viewmodels.MainViewModel
 
-class MainAdapter(val layoutID: Int, val viewModel: MainViewModel) :
+class MainAdapter(private val layoutID: Int, private val viewModel: MainViewModel) :
     RecyclerView.Adapter<MainViewHolder>() {
 
     private var lineItemList: List<LineItem?>? = null
@@ -29,12 +29,12 @@ class MainAdapter(val layoutID: Int, val viewModel: MainViewModel) :
         return if (lineItemList == null) 0 else lineItemList!!.size
     }
 
-    private fun getLayoutIdForPosition(position: Int): Int {
+    private fun getLayoutIdForPosition(): Int {
         return layoutID
     }
 
     override fun getItemViewType(position: Int): Int {
-        return getLayoutIdForPosition(position)
+        return getLayoutIdForPosition()
     }
 
     fun setLineItemList(list: List<LineItem?>?) {
